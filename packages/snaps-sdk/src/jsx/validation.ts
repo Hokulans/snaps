@@ -164,6 +164,10 @@ export const DropdownStruct: Describe<DropdownElement> = element('Dropdown', {
   children: maybeArray(OptionStruct),
 });
 
+export const FieldChildrenStruct = nullable(
+  nullUnion([tuple([InputStruct, ButtonStruct]), InputStruct, DropdownStruct]),
+);
+
 /**
  * A struct for the {@link FileInputElement} type.
  */
@@ -182,22 +186,19 @@ export const FileInputStruct: Describe<FileInputElement> = element(
 export const FieldStruct: Describe<FieldElement> = element('Field', {
   label: optional(string()),
   error: optional(string()),
-  children: nullUnion([
-    tuple([InputStruct, ButtonStruct]),
-    DropdownStruct,
-    FileInputStruct,
-    InputStruct,
-  ]),
+  children: FieldChildrenStruct,
 });
+
+export const FormChildrenStruct = maybeArray(
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  nullable(nullUnion([FieldStruct, lazy(() => BoxChildStruct)])),
+) as unknown as Struct<MaybeArray<GenericSnapElement | null>, null>;
 
 /**
  * A struct for the {@link FormElement} type.
  */
 export const FormStruct: Describe<FormElement> = element('Form', {
-  children: maybeArray(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    nullable(nullUnion([FieldStruct, lazy(() => BoxChildStruct)])),
-  ) as unknown as Struct<MaybeArray<GenericSnapElement | null>, null>,
+  children: FormChildrenStruct,
   name: string(),
 });
 
@@ -247,14 +248,19 @@ export const AddressStruct: Describe<AddressElement> = element('Address', {
   address: HexChecksumAddressStruct,
 });
 
+export const BoxChildrenStruct = maybeArray(
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  nullable(lazy(() => BoxChildStruct)),
+);
+
 /**
  * A struct for the {@link BoxElement} type.
  */
 export const BoxStruct: Describe<BoxElement> = element('Box', {
-  children: maybeArray(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    nullable(lazy(() => BoxChildStruct)),
-  ) as unknown as Struct<MaybeArray<GenericSnapElement | null>, null>,
+  children: BoxChildrenStruct as unknown as Struct<
+    MaybeArray<GenericSnapElement | null>,
+    null
+  >,
   direction: optional(nullUnion([literal('horizontal'), literal('vertical')])),
   alignment: optional(
     nullUnion([

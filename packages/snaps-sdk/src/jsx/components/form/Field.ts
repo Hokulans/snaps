@@ -18,7 +18,8 @@ export type FieldProps = {
     | [InputElement, ButtonElement]
     | DropdownElement
     | FileInputElement
-    | InputElement;
+    | InputElement
+    | null;
 };
 
 const TYPE = 'Field';
