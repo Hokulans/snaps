@@ -219,21 +219,21 @@ export const FieldStruct: Describe<FieldElement> = element('Field', {
   children: nullable(FieldChildStruct),
 });
 
-export const FormChildrenStruct = maybeArray(
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  nullable(nullUnion([FieldStruct, lazy(() => BoxChildStruct)])),
-) as unknown as Struct<MaybeArray<GenericSnapElement | null>, null>;
-
 /**
  * A subset of JSX elements that are allowed as children of the Form component.
  */
-export const FormChildStruct = nullUnion([FieldStruct, ButtonStruct]);
+export const FormChildStruct =
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  nullable(nullUnion([FieldStruct, lazy(() => BoxChildStruct)]));
 
 /**
  * A struct for the {@link FormElement} type.
  */
 export const FormStruct: Describe<FormElement> = element('Form', {
-  children: maybeArray(FormChildStruct),
+  children: maybeArray(FormChildStruct) as unknown as Struct<
+    MaybeArray<GenericSnapElement | null>,
+    null
+  >,
   name: string(),
 });
 
