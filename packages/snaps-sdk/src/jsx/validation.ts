@@ -67,7 +67,7 @@ export const KeyStruct: Describe<Key> = nullUnion([string(), number()]);
  * A struct for the {@link StringElement} type.
  */
 export const StringElementStruct: Describe<StringElement> = maybeArray(
-  string(),
+  nullUnion([string(), boolean()]),
 );
 
 /**
@@ -152,7 +152,7 @@ export const InputStruct: Describe<InputElement> = element('Input', {
  */
 export const OptionStruct: Describe<OptionElement> = element('Option', {
   value: string(),
-  children: string(),
+  children: StringElementStruct,
 });
 
 /**
@@ -161,7 +161,7 @@ export const OptionStruct: Describe<OptionElement> = element('Option', {
 export const DropdownStruct: Describe<DropdownElement> = element('Dropdown', {
   name: string(),
   value: optional(string()),
-  children: maybeArray(OptionStruct),
+  children: maybeArray(nullUnion([OptionStruct, boolean()])),
 });
 
 /**
@@ -187,6 +187,7 @@ export const FieldStruct: Describe<FieldElement> = element('Field', {
     DropdownStruct,
     FileInputStruct,
     InputStruct,
+    boolean(),
   ]),
 });
 
@@ -196,8 +197,8 @@ export const FieldStruct: Describe<FieldElement> = element('Field', {
 export const FormStruct: Describe<FormElement> = element('Form', {
   children: maybeArray(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    nullable(nullUnion([FieldStruct, lazy(() => BoxChildStruct)])),
-  ) as unknown as Struct<MaybeArray<GenericSnapElement | null>, null>,
+    nullable(nullUnion([FieldStruct, lazy(() => BoxChildStruct), boolean()])),
+  ) as unknown as Struct<MaybeArray<GenericSnapElement | boolean | null>, null>,
   name: string(),
 });
 
@@ -209,6 +210,7 @@ export const BoldStruct: Describe<BoldElement> = element('Bold', {
     nullable(
       nullUnion([
         string(),
+        boolean(),
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         lazy(() => ItalicStruct) as unknown as Struct<
           SnapElement<JsonObject, 'Italic'>
@@ -226,6 +228,7 @@ export const ItalicStruct: Describe<ItalicElement> = element('Italic', {
     nullable(
       nullUnion([
         string(),
+        boolean(),
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         lazy(() => BoldStruct) as unknown as Struct<
           SnapElement<JsonObject, 'Bold'>
@@ -253,8 +256,8 @@ export const AddressStruct: Describe<AddressElement> = element('Address', {
 export const BoxStruct: Describe<BoxElement> = element('Box', {
   children: maybeArray(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    nullable(lazy(() => BoxChildStruct)),
-  ) as unknown as Struct<MaybeArray<GenericSnapElement | null>, null>,
+    nullable(nullUnion([lazy(() => BoxChildStruct), boolean()])),
+  ) as unknown as Struct<MaybeArray<GenericSnapElement | boolean | null>, null>,
   direction: optional(nullUnion([literal('horizontal'), literal('vertical')])),
   alignment: optional(
     nullUnion([
@@ -308,7 +311,9 @@ export const ImageStruct: Describe<ImageElement> = element('Image', {
  */
 export const LinkStruct: Describe<LinkElement> = element('Link', {
   href: string(),
-  children: maybeArray(nullable(nullUnion([FormattingStruct, string()]))),
+  children: maybeArray(
+    nullable(nullUnion([FormattingStruct, string(), boolean()])),
+  ),
 });
 
 /**
@@ -316,7 +321,9 @@ export const LinkStruct: Describe<LinkElement> = element('Link', {
  */
 export const TextStruct: Describe<TextElement> = element('Text', {
   children: maybeArray(
-    nullable(nullUnion([string(), BoldStruct, ItalicStruct, LinkStruct])),
+    nullable(
+      nullUnion([string(), boolean(), BoldStruct, ItalicStruct, LinkStruct]),
+    ),
   ),
   alignment: optional(
     nullUnion([literal('start'), literal('center'), literal('end')]),
@@ -333,6 +340,7 @@ export const TooltipChildStruct = nullUnion([
   ItalicStruct,
   LinkStruct,
   ImageStruct,
+  boolean(),
 ]);
 
 /**
